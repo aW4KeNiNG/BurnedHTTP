@@ -47,6 +47,7 @@ class HTTPResponse
 	{
 		sendHeader("HTTP/1.1 404 File not found");
 		sendEndHeaders();
+		writeOutputStream("404 - File not found.");
 	}
 	//}
 	

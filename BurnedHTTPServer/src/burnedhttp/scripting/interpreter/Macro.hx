@@ -22,10 +22,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package hscript;
-import hscript.Expr.Error;
+package burnedhttp.scripting.interpreter;
+import burnedhttp.scripting.interpreter.Expr.Error;
 #if hscriptPos
-import hscript.Expr.ErrorDef;
+import burnedhttp.scripting.interpreter.Expr.ErrorDef;
 #end
 import haxe.macro.Expr;
 
@@ -135,7 +135,7 @@ class Macro {
 		};
 	}
 
-	public function convert( e : hscript.Expr ) : Expr {
+	public function convert( e : burnedhttp.scripting.interpreter.Expr ) : Expr {
 		return { expr : switch( #if hscriptPos e.e #else e #end ) {
 			case EConst(c):
 				EConst(switch(c) {

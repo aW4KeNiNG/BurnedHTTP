@@ -2,6 +2,9 @@ package burnedhttp;
 import burnedhttp.classes.ServerSettings;
 import burnedhttp.HTTPResponse;
 import burnedhttp.classes.Logger;
+import burnedhttp.scripting.interpreter.Expr;
+import burnedhttp.scripting.interpreter.Interp;
+import burnedhttp.scripting.interpreter.Parser;
 import haxe.io.Bytes;
 import haxe.io.Eof;
 import haxe.io.Path;
@@ -97,7 +100,7 @@ class BurnedHTTPServer extends BaseHTTPServer
 		//}
     ];
 	
-	private var executableFileTypes:Array<String> = [".hxc"];
+	private var executableFileTypes:Array<String> = [".hxsc"];
 	
 	public function SendBytesWithMIMEType(path:String, response:HTTPResponse)
 	{
@@ -141,6 +144,37 @@ class BurnedHTTPServer extends BaseHTTPServer
 			}
 			catch (e:Eof)
 			{	}
+		}
+		else
+		{
+			ExecuteScript(actualFilePath, response);
+		}
+	}
+	
+	public function ExecuteScript(fullPath:String, response:HTTPResponse)
+	{
+		var scriptCode = File.getContent(fullPath);
+		var parser = new Parser();
+		parser.allowTypes = true;
+		try
+		{
+			var ast = parser.parseString(scriptCode);
+			var interp = new Interp();
+			var output = interp.execute(ast);
+			response.sendHeader("HTTP/1.1 200 OK");
+			response.sendHeader("Content-Type: text/html");
+			response.sendEndHeaders();
+			response.writeOutputStream(output);
+		}
+		catch (e:Error)
+		{
+			//Parse error
+			var dError:String = "Script error: line " + parser.line+" " + e;
+			Logger.WriteLine(dError);
+			response.sendHeader("HTTP/1.1 200 OK");
+			response.sendHeader("Content-Type: text/html");
+			response.sendEndHeaders();
+			response.writeOutputStream(dError);
 		}
 	}
 	

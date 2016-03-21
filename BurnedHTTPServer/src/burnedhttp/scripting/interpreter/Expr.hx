@@ -22,7 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package hscript;
+package burnedhttp.scripting.interpreter;
 
 enum Const {
 	CInt( v : Int );

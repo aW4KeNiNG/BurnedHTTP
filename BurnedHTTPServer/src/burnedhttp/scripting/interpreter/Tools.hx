@@ -1,5 +1,5 @@
-package hscript;
-import hscript.Expr;
+package burnedhttp.scripting.interpreter;
+import burnedhttp.scripting.interpreter.Expr;
 
 class Tools {
 

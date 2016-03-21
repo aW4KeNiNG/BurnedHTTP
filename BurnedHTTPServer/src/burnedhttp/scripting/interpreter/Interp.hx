@@ -22,8 +22,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package hscript;
-import hscript.Expr;
+package burnedhttp.scripting.interpreter;
+import burnedhttp.scripting.interpreter.Expr;
 
 private enum Stop {
 	SBreak;
