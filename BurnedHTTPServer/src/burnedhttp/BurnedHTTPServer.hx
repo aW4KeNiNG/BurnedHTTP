@@ -1,18 +1,12 @@
 package burnedhttp;
-import burnedhttp.classes.ServerSettings;
-import burnedhttp.HTTPResponse;
-import burnedhttp.classes.Logger;
-import burnedhttp.scripting.interpreter.Expr;
-import burnedhttp.scripting.interpreter.Interp;
-import burnedhttp.scripting.interpreter.Parser;
-import haxe.io.Bytes;
-import haxe.io.Eof;
-import haxe.io.Path;
+import burnedhttp.*;
+import burnedhttp.classes.*;
+import burnedhttp.scripting.interpreter.*;
+import burnedhttp.scripting.ScriptType;
+import haxe.io.*;
 import hscript.*;
-import sys.db.Types.SString;
-import sys.FileSystem;
-import sys.io.File;
-import sys.net.Host;
+import sys.*;
+import sys.io.*;
 
 /**
  * ...
@@ -100,7 +94,7 @@ class BurnedHTTPServer extends BaseHTTPServer
 		//}
     ];
 	
-	private var executableFileTypes:Array<String> = [".hxsc"];
+	private var executableFileTypes:Array<String> = [".hsc",".hscx"];
 	
 	public function SendBytesWithMIMEType(path:String, response:HTTPResponse)
 	{
@@ -147,34 +141,62 @@ class BurnedHTTPServer extends BaseHTTPServer
 		}
 		else
 		{
-			ExecuteScript(actualFilePath, response);
+			switch (extension)
+			{
+				case ".hsc":
+					ExecuteScript(actualFilePath, response, ScriptType.InterpreterScript);
+				case ".hscx":
+					ExecuteScript(actualFilePath, response, ScriptType.ServerScript);
+			}
 		}
 	}
 	
-	public function ExecuteScript(fullPath:String, response:HTTPResponse)
+	public function ExecuteScript(fullPath:String, response:HTTPResponse, scriptType:ScriptType)
 	{
 		var scriptCode = File.getContent(fullPath);
 		var parser = new Parser();
 		parser.allowTypes = true;
-		try
+		switch (scriptType)
 		{
-			var ast = parser.parseString(scriptCode);
-			var interp = new Interp();
-			var output = interp.execute(ast);
-			response.sendHeader("HTTP/1.1 200 OK");
-			response.sendHeader("Content-Type: text/html");
-			response.sendEndHeaders();
-			response.writeOutputStream(output);
-		}
-		catch (e:Error)
-		{
-			//Parse error
-			var dError:String = "Script error: line " + parser.line+" " + e;
-			Logger.WriteLine(dError);
-			response.sendHeader("HTTP/1.1 200 OK");
-			response.sendHeader("Content-Type: text/html");
-			response.sendEndHeaders();
-			response.writeOutputStream(dError);
+			case ScriptType.InterpreterScript:
+				try
+				{
+					var ast = parser.parseString(scriptCode);
+					var interp = new Interp();
+					var output = interp.execute(ast);
+					response.sendHeader("HTTP/1.1 200 OK");
+					response.sendHeader("Content-Type: text/html");
+					response.sendEndHeaders();
+					response.writeOutputStream(output);
+				}
+				catch (e:Error)
+				{
+					//Parse error
+					var dError:String = "Script error: line " + parser.line+" " + e;
+					Logger.WriteLine(dError);
+					response.sendHeader("HTTP/1.1 200 OK");
+					response.sendHeader("Content-Type: text/html");
+					response.sendEndHeaders();
+					response.writeOutputStream(dError);
+				}
+			case ScriptType.ServerScript:
+				try
+				{
+					var ast = parser.parseString(scriptCode);
+					var interp = new Interp();
+					interp.variables.set("response", response);
+					var output = interp.execute(ast);
+				}
+				catch (e:Error)
+				{
+					//Parse error
+					var dError:String = "Script error: line " + parser.line+" " + e;
+					Logger.WriteLine(dError);
+					response.sendHeader("HTTP/1.1 200 OK");
+					response.sendHeader("Content-Type: text/html");
+					response.sendEndHeaders();
+					response.writeOutputStream(dError);
+				}
 		}
 	}
 	
