@@ -1,0 +1,1 @@
+haxe --each -cp src -cpp "C:/Users/Nihal Talur/Documents/GitLab/BurnedHTTP/BurnedHTTPServer/bin/cpp" -main burnedhttp.BurnedHTTPServerCLI

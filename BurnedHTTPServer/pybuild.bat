@@ -1,0 +1,1 @@
+haxe --each -cp src -python "C:/Users/Nihal Talur/Documents/GitLab/BurnedHTTP/BurnedHTTPServer/bin/python/BurnedHTTPServerCLI.py" -main burnedhttp.BurnedHTTPServerCLI

@@ -1,0 +1,1 @@
+haxe --each -cp src -cs "C:/Users/Nihal Talur/Documents/GitLab/BurnedHTTP/BurnedHTTPServer/bin/csharp" -main burnedhttp.BurnedHTTPServerCLI
